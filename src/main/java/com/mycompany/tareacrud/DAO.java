@@ -91,24 +91,116 @@ public class DAO<T> implements CRUD<T> {
         return null;
     }
 
+    
+    
     @Override
     public T read(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        T entity = null;
+    String sql = "SELECT * FROM " + entity.getClass().getSimpleName() + " WHERE id = ?";
+    
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, id);
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.next()) {
+            // Construye una nueva instancia de la clase T y establece sus atributos
+            entity = buildEntityFromResultSet(resultSet);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Manejo de errores
+    }
+    
+    return entity;
     }
 
+    
+    
     @Override
     public T update(T entity) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         String sql = "UPDATE " + entity.getClass().getSimpleName() + " SET ";
+    Method[] methods = entity.getClass().getMethods();
+    List<String> columnNames = new ArrayList<>();
+    
+    for (Method method : methods) {
+        if (method.getName().startsWith("get")) {
+            String columnName = method.getName().substring(3); // Elimina el prefijo 'get'
+            columnNames.add(columnName + " = ?");
+        }
+    }
+    
+    sql += String.join(", ", columnNames) + " WHERE id = ?";
+    
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        int parameterIndex = 1;
+        for (Method method : methods) {
+            if (method.getName().startsWith("get")) {
+                Object value = method.invoke(entity); // Invoca el método 'get' correspondiente para obtener el valor
+                statement.setObject(parameterIndex, value);
+                parameterIndex++;
+            }
+        }
+        // Agrega el ID como último parámetro
+        statement.setInt(parameterIndex, entity.getId());
+        
+        // Ejecuta la sentencia SQL de actualización
+        statement.executeUpdate();
+    } catch (SQLException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        e.printStackTrace();
+        // Manejo de errores
+    }
+    return entity;
     }
 
+    
+    
+    
+    
     @Override
     public void delete(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        
+    String sql = "DELETE FROM " + T.getClass().getSimpleName() + " WHERE id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        statement.setInt(1, id);
+        statement.executeUpdate();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Manejo de errores
     }
+}
 
     @Override
     public List<T> getAll() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        List<T> entities = new ArrayList<>();
+       
+    String sql = "SELECT * FROM " + entity.getClass().getSimpleName();
+    
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            // Para cada fila en el ResultSet, construye una instancia de la clase T y agrégala a la lista
+            T = buildEntityFromResultSet(resultSet);
+            entities.add(entity);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        // Manejo de errores
     }
+    
+    return entities;
+    }
+
+    private User buildUserFromResultSet(ResultSet resultSet) throws SQLException {
+    int id = resultSet.getInt("id");
+    String name = resultSet.getString("name");
+    String email = resultSet.getString("email");
+    return new User(id, name, email);
+}
+    
+    private Carro buildCarroFromResultSet(ResultSet resultSet) throws SQLException {
+    int id = resultSet.getInt("id");
+    String color = resultSet.getString("color");
+    String marca = resultSet.getString("marca");
+    return new Carro(id, color, marca);
+}
     
 }
