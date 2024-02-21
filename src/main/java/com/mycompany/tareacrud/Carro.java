@@ -3,23 +3,25 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.mycompany.tareacrud;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
  * @author pipe2
  */
-public class Carro {
-    
-    private int id;
+
+public class Carro extends Entity {
     private String marca;
     private String color;
 
-    public int getId() {
-        return id;
+    public Carro() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public Carro(int id, String marca, String color) {
+        super(id);
+        this.marca = marca;
+        this.color = color;
     }
 
     public String getMarca() {
@@ -37,7 +39,16 @@ public class Carro {
     public void setColor(String color) {
         this.color = color;
     }
+
     
-    
-    
+
+    // Implementación del método buildEntityFromResultSet para Carro
+    @Override
+    public Carro buildEntityFromResultSet(ResultSet resultSet) throws SQLException {
+        int id = resultSet.getInt("id");
+        String marca = resultSet.getString("marca");
+        String color = resultSet.getString("color");
+        return new Carro(id, marca, color);
+    }
 }
+
