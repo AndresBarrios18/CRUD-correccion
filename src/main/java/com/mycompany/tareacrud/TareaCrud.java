@@ -1,22 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
- */
-
 package com.mycompany.tareacrud;
 
+import dao.DAO;
 import java.util.Scanner;
 
-/**
- *
- * @author pipe2
- */
 public class TareaCrud {
 
     public static void main(String[] args) {
         
-        DAO<User> TDAO = (DAO<User>) DAO.getInstance();
-        DAO<Carro> CDAO = (DAO<Carro>) DAO.getInstance();
+        // Crear instancias de DAO para User y Carro
+        DAO<User> userDAO = (DAO<User>) DAO.getInstance();
+        DAO<Carro> carroDAO = (DAO<Carro>) DAO.getInstance();
         
         // Solicitar datos del usuario por consola
         Scanner scanner = new Scanner(System.in);
@@ -35,6 +28,9 @@ public class TareaCrud {
         user.setName(userName);
         user.setEmail(userEmail);
         
+        // Llamar al método create de UserDAO para insertar los datos en la base de datos
+        userDAO.create(user);
+        
         // Solicitar datos del carro por consola
         System.out.println("Ingrese los datos del carro:");
         System.out.print("ID: ");
@@ -50,8 +46,9 @@ public class TareaCrud {
         carro.setColor(carroColor);
         carro.setMarca(carroMarca);
         
-        // Llamar al método create de DAO para insertar los datos en la base de datos
-        CDAO.read(carroId);
+        // Llamar al método create de CarroDAO para insertar los datos en la base de datos
+        userDAO.create(user);
+        carroDAO.create(carro);
         
         // Cerrar el scanner
         scanner.close();
